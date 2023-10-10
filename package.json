@@ -1,5 +1,5 @@
 {
-  "name": "open-music-api-v1-submission",
+  "name": "open-music-api-submission",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -14,7 +14,9 @@
   "license": "ISC",
   "dependencies": {
     "@hapi/hapi": "^21.3.2",
+    "@hapi/jwt": "^3.2.0",
     "auto-bind": "^4.0.0",
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.3.1",
     "joi": "^17.10.2",
     "nanoid": "^3.3.6",
