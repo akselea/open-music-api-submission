@@ -2,6 +2,8 @@ require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
+const Inert = require('@hapi/inert');
+const path = require('path');
 
 const ClientError = require('./exceptions/ClientError');
 
@@ -30,13 +32,25 @@ const collaborations = require('./api/collaborations');
 const CollaborationsService = require('./services/postgres/CollaborationsService');
 const CollaborationValidator = require('./validator/collaborations');
 
+const _exports = require('./api/exports');
+const ProducersService = require('./services/rabbitmq/ProducersService');
+const ExportValidator = require('./validator/exports');
+
+const uploads = require('./api/uploads');
+const StoragesService = require('./services/storage/StoragesService');
+const UploadValidator = require('./validator/uploads');
+
+const CachesService = require('./services/redis/CachesService');
+
 const init = async () => {
-  const albumsService = new AlbumsService();
+  const cachesService = new CachesService();
+  const albumsService = new AlbumsService(cachesService);
   const songsService = new SongsService();
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
   const collaborationsService = new CollaborationsService();
   const playlistsService = new PlaylistsService(collaborationsService);
+  const storagesService = new StoragesService(path.resolve(__dirname, 'api/uploads/file/images'));
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -51,6 +65,9 @@ const init = async () => {
   await server.register([
     {
       plugin: Jwt,
+    },
+    {
+      plugin: Inert,
     },
   ]);
 
@@ -116,6 +133,22 @@ const init = async () => {
         playlistsService,
         usersService,
         validator: CollaborationValidator,
+      },
+    },
+    {
+      plugin: _exports,
+      options: {
+        ProducersService,
+        playlistsService,
+        validator: ExportValidator,
+      },
+    },
+    {
+      plugin: uploads,
+      options: {
+        albumsService,
+        storagesService,
+        validator: UploadValidator,
       },
     },
   ]);

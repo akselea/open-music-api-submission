@@ -2,3 +2,7 @@ node_modules
 .env
 Open Music API V1 Test.postman_collection.json
 OpenMusic API Test.postman_environment.json
+picture-large.jpg
+picture-small.jpg
+small-text.txt
+src/api/uploads/file
